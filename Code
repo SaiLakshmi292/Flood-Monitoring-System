@@ -1,0 +1,29 @@
+from machine import Pin, time_pulse_us
+import utime
+
+trigger = Pin(3, Pin.OUT)
+echo = Pin(2, Pin.IN)
+buzzer = Pin(15, Pin.OUT)
+
+def measure_distance():
+    trigger.low()
+    utime.sleep_us(2)
+    trigger.high()
+    utime.sleep_us(10)
+    trigger.low()
+    
+    duration = time_pulse_us(echo, 1, 30000)
+    distance_cm = duration * 0.0343 / 2
+    return distance_cm
+
+while True:
+    distance = measure_distance()
+    print("Water Level Distance: {:.2f} cm".format(distance))
+    
+    if distance < 10:  # Set threshold value
+        print("Flood Alert!")
+        buzzer.high()
+    else:
+        buzzer.low()
+    
+    utime.sleep(1)
